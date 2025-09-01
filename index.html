@@ -26,11 +26,15 @@
         </div>
       </div>
       <div class="ml-auto flex items-center gap-2">
-        <button id="langKR" class="btn">KR</button>
-        <button id="langEN" class="btn">EN</button>
-        <a id="downloadJSON" class="btn" href="#">JSON</a>
-        <a id="downloadCSV" class="btn" href="#">CSV</a>
-        <button id="resetDraft" class="btn">Reset</button>
+        <div class="flex items-center gap-2">
+          <button id="langKR" class="btn">KR</button>
+          <button id="langEN" class="btn">EN</button>
+        </div>
+        <div class="hidden sm:flex items-center gap-2">
+          <a id="downloadJSON" class="btn" href="#">JSON</a>
+          <a id="downloadCSV" class="btn" href="#">CSV</a>
+          <button id="resetDraft" class="btn">Reset</button>
+        </div>
       </div>
     </div>
   </header>
@@ -38,19 +42,19 @@
   <main class="mx-auto max-w-6xl px-4 py-6">
     <!-- Hero -->
     <section class="card p-6 mb-6">
-      <div class="flex items-center gap-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div>
           <h1 class="text-2xl font-bold" id="hero-title">고객 관리 포털</h1>
-          <p class="text-gray-600" id="hero-sub">장비/소모품 사용 가이드와 컴플레인 접수를 한 곳에서.</p>
+          <p class="text-gray-600" id="hero-sub">장비/소모품 사용 가이드와 문의사항 접수를 한 곳에서.</p>
         </div>
-        <div class="ml-auto flex items-center gap-2">
-          <label class="flex items-center gap-2">
+        <div class="sm:ml-auto w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <label class="flex items-center gap-2 w-full">
             <span class="text-sm text-gray-600" id="lbl-recipient">수신 이메일</span>
-            <input id="cfgRecipient" type="email" class="px-3 py-2 rounded-xl border w-72" value="Techsupport.KR@bio-techne.com" />
+            <input id="cfgRecipient" type="email" class="px-3 py-2 rounded-xl border w-full sm:w-72" value="Techsupport.KR@bio-techne.com" />
           </label>
-          <label class="flex items-center gap-2">
+          <label class="flex items-center gap-2 w-full">
             <span class="text-sm text-gray-600" id="lbl-cc">CC</span>
-            <input id="cfgCC" type="text" class="px-3 py-2 rounded-xl border w-72" placeholder="comma-separated" />
+            <input id="cfgCC" type="text" class="px-3 py-2 rounded-xl border w-full sm:w-72" placeholder="comma-separated" />
           </label>
         </div>
       </div>
@@ -60,13 +64,12 @@
     <section class="mb-6">
       <div class="grid grid-cols-2 gap-3">
         <button data-tab="guide" class="btn-primary btn" id="tab-guide">장비 가이드</button>
-        <button data-tab="complaint" class="btn" id="tab-complaint">컴플레인 접수</button>
+        <button data-tab="complaint" class="btn" id="tab-complaint">문의사항 접수</button>
       </div>
     </section>
 
     <!-- GUIDE TAB -->
     <section id="panel-guide" class="space-y-6">
-      <!-- Search & filters -->
       <div class="card p-4">
         <div class="flex flex-wrap items-center gap-3">
           <input id="searchGuide" type="search" class="px-3 py-2 rounded-xl border w-full sm:w-80" placeholder="장비/키워드 검색" />
@@ -79,18 +82,24 @@
         </div>
       </div>
 
-      <!-- Guide cards -->
       <div id="guideGrid" class="grid md:grid-cols-2 gap-4"></div>
 
       <div class="text-xs text-gray-500">
-        ※ 본 페이지의 가이드는 샘플/템플릿입니다. 실제 SOP, 유지보수 정책, 보증 규정은 귀사/제조사 공식 문서를 우선합니다. (This page contains sample templates; always defer to official SOPs and warranty policies.)
+        ※ 본 페이지의 가이드는 샘플/템플릿입니다. 실제 SOP, 유지보수 정책, 보증 규정은 귀사/제조사 공식 문서를 우선합니다.
       </div>
     </section>
 
     <!-- COMPLAINT TAB -->
     <section id="panel-complaint" class="hidden space-y-6">
       <div class="card p-6">
-        <h2 class="text-xl font-semibold mb-4" id="cmp-title">컴플레인 접수(Complaint Intake)</h2>
+        <h2 class="text-xl font-semibold mb-4" id="cmp-title">문의사항 접수</h2>
+
+        <!-- Quick Links for Issue Reports -->
+        <div class="mb-6 grid gap-2">
+          <a href="https://forms.gle/W89pzNP7PZBENzM2A" target="_blank" class="btn btn-primary w-full">Maurice Cartridge Issue Report</a>
+          <a href="https://sites.google.com/view/jess-troubleshooting/%ED%99%88" target="_blank" class="btn btn-primary w-full">Simple Western Issue Report</a>
+        </div>
+
         <form id="cmpForm" class="grid md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm req" for="company" id="lbl-company">회사명</label>
@@ -220,7 +229,7 @@
   </template>
 
   <script>
-  // --- Data (edit freely) ----------------------------------------------------
+  // --- Data ---------------------------------------------------------
   const GUIDE = [
     {
       code: 'MAU-CRT', category: 'Biologics', title: 'Maurice — Cartridge 기본 가이드',
@@ -283,33 +292,33 @@
     }
   ];
 
-  // --- i18n (KR/EN) ---------------------------------------------------------
+  // --- i18n ---------------------------------------------------------
   const I18N = {
     KR: {
       heroTitle: '고객 관리 포털',
-      heroSub: '장비/소모품 사용 가이드와 컴플레인 접수를 한 곳에서.',
-      tabs: { guide: '장비 가이드', complaint: '컴플레인 접수' },
+      heroSub: '장비/소모품 사용 가이드와 문의사항 접수를 한 곳에서.',
+      tabs: { guide: '장비 가이드', complaint: '문의사항 접수' },
       labels: {
         recipient: '수신 이메일', cc: 'CC', company: '회사명', contact: '담당자명', email:'이메일', phone:'연락처', instrument:'장비', serial:'시리얼 번호', location:'설치 위치(빌딩/랩)', urgency:'긴급도', symptom:'증상 요약', details:'상세 내용', attachments:'첨부 링크(선택)', salescc:'영업/내부 CC'
       },
       btns: { preview:'미리보기', send:'이메일로 보내기', save:'초안 저장', clear:'입력 지우기' },
-      cmpTitle: '컴플레인 접수(Complaint Intake)', previewTitle: '메일 본문 미리보기'
+      cmpTitle: '문의사항 접수', previewTitle: '메일 본문 미리보기'
     },
     EN: {
       heroTitle: 'Customer Care Portal',
-      heroSub: 'Guides & complaint intake in one place.',
-      tabs: { guide: 'Guides', complaint: 'Complaint Intake' },
+      heroSub: 'Guides & inquiry intake in one place.',
+      tabs: { guide: 'Guides', complaint: 'Inquiry Intake' },
       labels: {
         recipient: 'Recipient', cc: 'CC', company: 'Company', contact: 'Contact', email:'Email', phone:'Phone', instrument:'Instrument', serial:'Serial No.', location:'Location (Bldg/Lab)', urgency:'Urgency', symptom:'Issue Summary', details:'Details', attachments:'Attachment Link (opt.)', salescc:'Sales/Internal CC'
       },
       btns: { preview:'Preview', send:'Send Email', save:'Save Draft', clear:'Clear' },
-      cmpTitle: 'Complaint Intake', previewTitle: 'Email Preview'
+      cmpTitle: 'Inquiry Intake', previewTitle: 'Email Preview'
     }
   };
 
   let lang = 'KR';
 
-  // --- Helpers ---------------------------------------------------------------
+  // --- Helpers -----------------------------------------------------
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
 
@@ -322,7 +331,7 @@
     return header + '\n' + row + '\n';
   }
 
-  // --- Tabs -----------------------------------------------------------------
+  // --- Tabs --------------------------------------------------------
   function setTab(id){
     $('#panel-guide').classList.toggle('hidden', id!=='guide');
     $('#panel-complaint').classList.toggle('hidden', id!=='complaint');
@@ -330,7 +339,7 @@
     $('#tab-complaint').classList.toggle('btn-primary', id==='complaint');
   }
 
-  // --- Render guide cards ----------------------------------------------------
+  // --- Render guide cards -----------------------------------------
   function renderGuides(filter='all', search=''){
     const grid = $('#guideGrid');
     grid.innerHTML = '';
@@ -354,7 +363,7 @@
     }
   }
 
-  // --- Complaint form --------------------------------------------------------
+  // --- Complaint form ---------------------------------------------
   function formData(){
     const f = $('#cmpForm');
     const data = Object.fromEntries(new FormData(f).entries());
@@ -363,7 +372,7 @@
 
   function buildEmailBody(data){
     return (
-`[Complaint Intake]\n\n`+
+`[Inquiry Intake]\n\n`+
 `회사명(Company): ${data.company}\n`+
 `담당자(Contact): ${data.contact}\n`+
 `이메일(Email): ${data.email}\n`+
@@ -389,7 +398,7 @@
     const data = formData();
     const recipient = $('#cfgRecipient').value.trim() || 'Techsupport.KR@bio-techne.com';
     const ccCfg = $('#cfgCC').value.trim();
-    const subject = `[Complaint] ${data.company} — ${data.instrument} (${data.serial})`;
+    const subject = `[Inquiry] ${data.company} — ${data.instrument} (${data.serial})`;
     const body = buildEmailBody(data);
     const ccPart = ccCfg ? `&cc=${encodeRFC3986(ccCfg)}` : '';
     const mailto = `mailto:${encodeRFC3986(recipient)}?subject=${encodeRFC3986(subject)}${ccPart}&body=${encodeRFC3986(body)}`;
@@ -411,14 +420,12 @@
   function loadDraft(){ try{ const d = JSON.parse(localStorage.getItem('cmpDraft')||'{}'); for(const [k,v] of Object.entries(d)){ const el = document.getElementById(k); if(el) el.value = v; } }catch(_){} }
   function clearForm(){ $('#cmpForm').reset(); updatePreview(); }
 
-  // Download JSON / CSV of current form
   function download(filename, content){
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([content], {type:'text/plain'}));
     a.download = filename; a.click();
   }
 
-  // i18n swap
   function setLang(next){
     lang = next; const t = I18N[lang];
     $('#hero-title').textContent = t.heroTitle;
@@ -447,25 +454,21 @@
     $('#btnClear').textContent = t.btns.clear;
   }
 
-  // --- Init ------------------------------------------------------------------
   function init(){
     setTab('guide');
     renderGuides('all','');
     setLang('KR');
     $('#year').textContent = new Date().getFullYear();
 
-    // Tab handlers
     $('#tab-guide').addEventListener('click', () => setTab('guide'));
     $('#tab-complaint').addEventListener('click', () => setTab('complaint'));
 
-    // Filter buttons
     $$('#panel-guide [data-filter]').forEach(b => b.addEventListener('click', () => {
       const f = b.getAttribute('data-filter');
       renderGuides(f, $('#searchGuide').value);
     }));
     $('#searchGuide').addEventListener('input', (e)=> renderGuides('all', e.target.value));
 
-    // Complaint
     $('#btnPreview').addEventListener('click', updatePreview);
     $('#btnSendEmail').addEventListener('click', sendEmail);
     $('#btnSaveDraft').addEventListener('click', saveDraft);
@@ -473,15 +476,12 @@
     $('#cmpForm').addEventListener('input', updatePreview);
     loadDraft(); updatePreview();
 
-    // Downloads
-    $('#downloadJSON').addEventListener('click', (e)=>{ e.preventDefault(); download('complaint.json', JSON.stringify(formData(), null, 2)); });
-    $('#downloadCSV').addEventListener('click', (e)=>{ e.preventDefault(); download('complaint.csv', objToCSV(formData())); });
+    $('#downloadJSON').addEventListener('click', (e)=>{ e.preventDefault(); download('inquiry.json', JSON.stringify(formData(), null, 2)); });
+    $('#downloadCSV').addEventListener('click', (e)=>{ e.preventDefault(); download('inquiry.csv', objToCSV(formData())); });
     $('#resetDraft').addEventListener('click', ()=>{ localStorage.removeItem('cmpDraft'); clearForm(); });
 
-    // Endpoint test
     $('#btnTestPost').addEventListener('click', testPost);
 
-    // Lang buttons
     $('#langKR').addEventListener('click', ()=> setLang('KR'));
     $('#langEN').addEventListener('click', ()=> setLang('EN'));
   }
