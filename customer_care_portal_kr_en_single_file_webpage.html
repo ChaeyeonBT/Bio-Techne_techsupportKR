@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Customer Care Portal (KR/EN) — Bio‑Techne Korea</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="color-scheme" content="light only" />
+  <style>
+    .card{ @apply bg-white rounded-2xl shadow-md border border-gray-100; }
+    .btn{ @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium border border-gray-300 hover:bg-gray-50 active:scale-[.99] transition; }
+    .btn-primary{ @apply bg-black text-white border-black hover:bg-gray-800; }
+    details[open] summary svg{ transform: rotate(180deg); }
+    .req::after{ content: ' *'; color:#e11d48; }
+    .kbd{ @apply px-1.5 py-0.5 rounded border text-xs font-mono bg-gray-50; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-200">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <div class="h-8 w-8 rounded-xl bg-black text-white grid place-items-center font-bold">BT</div>
+        <div>
+          <div class="text-sm text-gray-500" id="brand-sub">Customer Care Portal</div>
+          <div class="font-semibold" id="brand-title">Bio‑Techne Korea</div>
+        </div>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <button id="langKR" class="btn">KR</button>
+        <button id="langEN" class="btn">EN</button>
+        <a id="downloadJSON" class="btn" href="#">JSON</a>
+        <a id="downloadCSV" class="btn" href="#">CSV</a>
+        <button id="resetDraft" class="btn">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-6">
+    <!-- Hero -->
+    <section class="card p-6 mb-6">
+      <div class="flex items-center gap-4">
+        <div>
+          <h1 class="text-2xl font-bold" id="hero-title">고객 관리 포털</h1>
+          <p class="text-gray-600" id="hero-sub">장비/소모품 사용 가이드와 컴플레인 접수를 한 곳에서.</p>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <label class="flex items-center gap-2">
+            <span class="text-sm text-gray-600" id="lbl-recipient">수신 이메일</span>
+            <input id="cfgRecipient" type="email" class="px-3 py-2 rounded-xl border w-72" value="Techsupport.KR@bio-techne.com" />
+          </label>
+          <label class="flex items-center gap-2">
+            <span class="text-sm text-gray-600" id="lbl-cc">CC</span>
+            <input id="cfgCC" type="text" class="px-3 py-2 rounded-xl border w-72" placeholder="comma-separated" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <section class="mb-6">
+      <div class="grid grid-cols-2 gap-3">
+        <button data-tab="guide" class="btn-primary btn" id="tab-guide">장비 가이드</button>
+        <button data-tab="complaint" class="btn" id="tab-complaint">컴플레인 접수</button>
+      </div>
+    </section>
+
+    <!-- GUIDE TAB -->
+    <section id="panel-guide" class="space-y-6">
+      <!-- Search & filters -->
+      <div class="card p-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <input id="searchGuide" type="search" class="px-3 py-2 rounded-xl border w-full sm:w-80" placeholder="장비/키워드 검색" />
+          <div class="flex flex-wrap gap-2">
+            <button class="btn" data-filter="all">All</button>
+            <button class="btn" data-filter="Biologics">Biologics</button>
+            <button class="btn" data-filter="Simple Western">Simple Western</button>
+            <button class="btn" data-filter="Simple Plex">Simple Plex</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guide cards -->
+      <div id="guideGrid" class="grid md:grid-cols-2 gap-4"></div>
+
+      <div class="text-xs text-gray-500">
+        ※ 본 페이지의 가이드는 샘플/템플릿입니다. 실제 SOP, 유지보수 정책, 보증 규정은 귀사/제조사 공식 문서를 우선합니다. (This page contains sample templates; always defer to official SOPs and warranty policies.)
+      </div>
+    </section>
+
+    <!-- COMPLAINT TAB -->
+    <section id="panel-complaint" class="hidden space-y-6">
+      <div class="card p-6">
+        <h2 class="text-xl font-semibold mb-4" id="cmp-title">컴플레인 접수(Complaint Intake)</h2>
+        <form id="cmpForm" class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm req" for="company" id="lbl-company">회사명</label>
+            <input id="company" name="company" class="mt-1 w-full px-3 py-2 rounded-xl border" required />
+          </div>
+          <div>
+            <label class="block text-sm req" for="contact" id="lbl-contact">담당자명</label>
+            <input id="contact" name="contact" class="mt-1 w-full px-3 py-2 rounded-xl border" required />
+          </div>
+          <div>
+            <label class="block text-sm req" for="email" id="lbl-email">이메일</label>
+            <input id="email" name="email" type="email" class="mt-1 w-full px-3 py-2 rounded-xl border" required />
+          </div>
+          <div>
+            <label class="block text-sm req" for="phone" id="lbl-phone">연락처</label>
+            <input id="phone" name="phone" class="mt-1 w-full px-3 py-2 rounded-xl border" placeholder="01012345678" required />
+          </div>
+          <div>
+            <label class="block text-sm req" for="instrument" id="lbl-instrument">장비</label>
+            <select id="instrument" name="instrument" class="mt-1 w-full px-3 py-2 rounded-xl border" required>
+              <option value="Maurice">Maurice</option>
+              <option value="Jess">Jess</option>
+              <option value="Ella">Ella</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm req" for="serial" id="lbl-serial">시리얼 번호</label>
+            <input id="serial" name="serial" class="mt-1 w-full px-3 py-2 rounded-xl border" required />
+          </div>
+          <div>
+            <label class="block text-sm" for="location" id="lbl-location">설치 위치(빌딩/랩)</label>
+            <input id="location" name="location" class="mt-1 w-full px-3 py-2 rounded-xl border" />
+          </div>
+          <div>
+            <label class="block text-sm" for="urgency" id="lbl-urgency">긴급도</label>
+            <select id="urgency" name="urgency" class="mt-1 w-full px-3 py-2 rounded-xl border">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm req" for="symptom" id="lbl-symptom">증상 요약</label>
+            <input id="symptom" name="symptom" class="mt-1 w-full px-3 py-2 rounded-xl border" placeholder="예: Baseline drift, Peak splitting, Pressure leak 등" required />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm" for="details" id="lbl-details">상세 내용</label>
+            <textarea id="details" name="details" rows="6" class="mt-1 w-full px-3 py-2 rounded-xl border" placeholder="언제부터, 재현성 여부, 최근 변경사항(버퍼/카트리지/소프트웨어 등), 에러 코드, 재현 절차(step-by-step) 등"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm" for="attachments" id="lbl-attachments">첨부 링크(선택)</label>
+            <input id="attachments" name="attachments" class="mt-1 w-full px-3 py-2 rounded-xl border" placeholder="Drive/Dropbox 링크" />
+          </div>
+          <div>
+            <label class="block text-sm" for="salesCC" id="lbl-salescc">영업/내부 CC</label>
+            <input id="salesCC" name="salesCC" class="mt-1 w-full px-3 py-2 rounded-xl border" placeholder="쉼표로 여러 명 입력" />
+          </div>
+        </form>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button id="btnPreview" class="btn">미리보기</button>
+          <button id="btnSendEmail" class="btn-primary">이메일로 보내기</button>
+          <button id="btnSaveDraft" class="btn">초안 저장</button>
+          <button id="btnClear" class="btn">입력 지우기</button>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <h3 class="font-semibold mb-2" id="preview-title">메일 본문 미리보기</h3>
+        <textarea id="previewBody" class="w-full h-56 p-3 rounded-xl border font-mono text-sm" readonly></textarea>
+        <div class="mt-3 text-xs text-gray-500">
+          기본 전송 방식은 <span class="font-semibold">mailto</span> 입니다. 별도 수집 서버(예: Google Apps Script, Formspree 등)를 사용하려면 엔드포인트를 설정하세요.
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <input id="endpoint" class="px-3 py-2 rounded-xl border w-full sm:w-[520px]" placeholder="옵션: POST 수집 엔드포인트(URL)" />
+          <button id="btnTestPost" class="btn">엔드포인트 테스트</button>
+        </div>
+        <pre id="postResult" class="mt-3 whitespace-pre-wrap text-xs text-gray-600"></pre>
+      </div>
+
+      <div class="text-xs text-gray-500">
+        개인정보 수집 안내: 본 폼은 고객 지원 목적으로만 사용됩니다. 민감정보는 입력하지 마시고, 파일은 링크로 공유해 주세요.
+      </div>
+    </section>
+  </main>
+
+  <footer class="mx-auto max-w-6xl px-4 pb-10 pt-6 text-xs text-gray-500">
+    © <span id="year"></span> Bio‑Techne Korea · 문의: <a class="underline" href="mailto:Techsupport.KR@bio-techne.com">Techsupport.KR@bio-techne.com</a>
+  </footer>
+
+  <template id="tpl-card">
+    <div class="card p-5 flex flex-col gap-3">
+      <div class="flex items-start gap-2">
+        <div class="text-sm px-2 py-1 rounded bg-gray-100" data-field="category">Category</div>
+        <div class="ml-auto text-xs text-gray-500" data-field="code">#CODE</div>
+      </div>
+      <h3 class="text-lg font-semibold" data-field="title">Title</h3>
+      <p class="text-sm text-gray-600" data-field="desc">Description</p>
+
+      <details class="mt-1">
+        <summary class="cursor-pointer select-none flex items-center justify-between py-2">
+          <span class="font-medium">사용 방법·체크리스트 (How‑to & Checklist)</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transition" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+        </summary>
+        <ul class="list-disc pl-6 text-sm space-y-1" data-field="howto"></ul>
+      </details>
+
+      <details>
+        <summary class="cursor-pointer select-none flex items-center justify-between py-2">
+          <span class="font-medium">유지보수 (Maintenance)</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transition" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+        </summary>
+        <ul class="list-disc pl-6 text-sm space-y-1" data-field="maint"></ul>
+      </details>
+
+      <details>
+        <summary class="cursor-pointer select-none flex items-center justify-between py-2">
+          <span class="font-medium">FAQ / Troubleshooting</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transition" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+        </summary>
+        <ul class="list-disc pl-6 text-sm space-y-1" data-field="faq"></ul>
+      </details>
+
+      <div class="flex flex-wrap gap-2 pt-1" data-field="links"></div>
+    </div>
+  </template>
+
+  <script>
+  // --- Data (edit freely) ----------------------------------------------------
+  const GUIDE = [
+    {
+      code: 'MAU-CRT', category: 'Biologics', title: 'Maurice — Cartridge 기본 가이드',
+      desc: '카트리지 보관/컨디셔닝, 사용 후 보관, 폐기까지 기본 절차 템플릿.',
+      howto: [
+        '개봉 전 실온 이슬점 주의(결로 방지).',
+        '사용 전 제조사 가이드에 따라 프라임/컨디셔닝.',
+        '주입 시 누설 여부 확인(압력/진공 변화 모니터).',
+        '사용 후 라인 세척 및 보관 조건 준수(광/온도/습도).',
+      ],
+      maint: [
+        '일일: 상태 점검(누설, 라인 버블), 소모품 재고 확인.',
+        '주간: 웨이스트 라인/필터 확인, 로그 파일 백업.',
+        '월간: 소프트웨어/펌웨어 버전 확인 및 변경 이력 기록.',
+      ],
+      faq: [
+        'Q. 베이스라인 드리프트? → 버퍼 신선도, 온도 안정화, 기포 제거 절차 점검.',
+        'Q. 피크 스플리팅? → 카트리지 연결상태/라인 스트레인, 시료 점도 확인.',
+      ],
+      links: [
+        { label: 'Notion: Maurice Cartridge', href: 'https://intelligent-minute-4e0.notion.site/Maurice-Cartridge-5343493d0bfb41a3b989fd767cc6dd83' },
+      ]
+    },
+    {
+      code: 'SWE-JES', category: 'Simple Western', title: 'Jess — 트러블슈팅 허브',
+      desc: '일반 이슈 분류와 체크리스트, 외부 가이드 링크.',
+      howto: [
+        '샘플/항체 준비 가이드(농도/희석/보관) 준수.',
+        'Plate 로딩 전 버블 제거, Cap 정렬 상태 확인.',
+        '런 전에 장비 상태(온/습/온도 안정화) 확인.',
+      ],
+      maint: [
+        '일일: 폐기물 비우기, plate seal 점검.',
+        '주간: 시스템 점검(run log), 소비재 재고 확인.',
+        '월간: 교육자료 업데이트 및 팀 공유.',
+      ],
+      faq: [
+        'Q. 밴드가 희미함 → 항체 희석/노출시간/시그널 채널 재검토.',
+        'Q. 재현성 낮음 → 시료 준비/plate 로딩/온도 영향 점검.',
+      ],
+      links: [
+        { label: 'Google Sites: Jess Troubleshooting', href: 'https://sites.google.com/view/jess-troubleshooting/%ED%99%88' },
+      ]
+    },
+    {
+      code: 'SPL-ELL', category: 'Simple Plex', title: 'Ella — 카트리지 & 유지관리 템플릿',
+      desc: '카트리지 취급, 세척, 보관, QC 샘플 관리 템플릿.',
+      howto: [
+        '런 전 카트리지 실온 평형, 냉각 응결 방지.',
+        'QC 샘플 준비 및 체인 정보 기록.',
+      ],
+      maint: [
+        '일일: 폐기물/버퍼 수위 확인.',
+        '주간: 인쇄물/보고서 포맷 검토.',
+      ],
+      faq: [
+        'Q. 높은 CV → 피펫팅/카트리지 로트/환경 영향 점검.',
+      ],
+      links: []
+    }
+  ];
+
+  // --- i18n (KR/EN) ---------------------------------------------------------
+  const I18N = {
+    KR: {
+      heroTitle: '고객 관리 포털',
+      heroSub: '장비/소모품 사용 가이드와 컴플레인 접수를 한 곳에서.',
+      tabs: { guide: '장비 가이드', complaint: '컴플레인 접수' },
+      labels: {
+        recipient: '수신 이메일', cc: 'CC', company: '회사명', contact: '담당자명', email:'이메일', phone:'연락처', instrument:'장비', serial:'시리얼 번호', location:'설치 위치(빌딩/랩)', urgency:'긴급도', symptom:'증상 요약', details:'상세 내용', attachments:'첨부 링크(선택)', salescc:'영업/내부 CC'
+      },
+      btns: { preview:'미리보기', send:'이메일로 보내기', save:'초안 저장', clear:'입력 지우기' },
+      cmpTitle: '컴플레인 접수(Complaint Intake)', previewTitle: '메일 본문 미리보기'
+    },
+    EN: {
+      heroTitle: 'Customer Care Portal',
+      heroSub: 'Guides & complaint intake in one place.',
+      tabs: { guide: 'Guides', complaint: 'Complaint Intake' },
+      labels: {
+        recipient: 'Recipient', cc: 'CC', company: 'Company', contact: 'Contact', email:'Email', phone:'Phone', instrument:'Instrument', serial:'Serial No.', location:'Location (Bldg/Lab)', urgency:'Urgency', symptom:'Issue Summary', details:'Details', attachments:'Attachment Link (opt.)', salescc:'Sales/Internal CC'
+      },
+      btns: { preview:'Preview', send:'Send Email', save:'Save Draft', clear:'Clear' },
+      cmpTitle: 'Complaint Intake', previewTitle: 'Email Preview'
+    }
+  };
+
+  let lang = 'KR';
+
+  // --- Helpers ---------------------------------------------------------------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+  function encodeRFC3986(str){ return encodeURIComponent(str).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase()); }
+
+  function objToCSV(obj){
+    const order = ['company','contact','email','phone','instrument','serial','location','urgency','symptom','details','attachments','salesCC'];
+    const header = order.join(',');
+    const row = order.map(k => '"' + (obj[k]||'').toString().replace(/"/g,'""') + '"').join(',');
+    return header + '\n' + row + '\n';
+  }
+
+  // --- Tabs -----------------------------------------------------------------
+  function setTab(id){
+    $('#panel-guide').classList.toggle('hidden', id!=='guide');
+    $('#panel-complaint').classList.toggle('hidden', id!=='complaint');
+    $('#tab-guide').classList.toggle('btn-primary', id==='guide');
+    $('#tab-complaint').classList.toggle('btn-primary', id==='complaint');
+  }
+
+  // --- Render guide cards ----------------------------------------------------
+  function renderGuides(filter='all', search=''){
+    const grid = $('#guideGrid');
+    grid.innerHTML = '';
+    const data = GUIDE.filter(g => (filter==='all' || g.category===filter) && (g.title+g.desc+g.code).toLowerCase().includes(search.toLowerCase()));
+    for(const g of data){
+      const t = document.getElementById('tpl-card').content.cloneNode(true);
+      t.querySelector('[data-field="category"]').textContent = g.category;
+      t.querySelector('[data-field="code"]').textContent = '#' + g.code;
+      t.querySelector('[data-field="title"]').textContent = g.title;
+      t.querySelector('[data-field="desc"]').textContent = g.desc;
+      t.querySelector('[data-field="howto"]').innerHTML = g.howto.map(x => `<li>${x}</li>`).join('');
+      t.querySelector('[data-field="maint"]').innerHTML = g.maint.map(x => `<li>${x}</li>`).join('');
+      t.querySelector('[data-field="faq"]').innerHTML = g.faq.map(x => `<li>${x}</li>`).join('');
+      const links = t.querySelector('[data-field="links"]');
+      g.links.forEach(({label, href})=>{
+        const a = document.createElement('a');
+        a.href = href; a.target = '_blank'; a.rel = 'noopener';
+        a.className = 'btn'; a.textContent = label; links.appendChild(a);
+      });
+      grid.appendChild(t);
+    }
+  }
+
+  // --- Complaint form --------------------------------------------------------
+  function formData(){
+    const f = $('#cmpForm');
+    const data = Object.fromEntries(new FormData(f).entries());
+    return data;
+  }
+
+  function buildEmailBody(data){
+    return (
+`[Complaint Intake]\n\n`+
+`회사명(Company): ${data.company}\n`+
+`담당자(Contact): ${data.contact}\n`+
+`이메일(Email): ${data.email}\n`+
+`연락처(Phone): ${data.phone}\n`+
+`장비(Instrument): ${data.instrument}\n`+
+`시리얼(Serial): ${data.serial}\n`+
+`설치 위치(Location): ${data.location||''}\n`+
+`긴급도(Urgency): ${data.urgency||''}\n`+
+`증상 요약(Summary): ${data.symptom}\n\n`+
+`상세 내용(Details):\n${data.details||''}\n\n`+
+`첨부 링크(Attachments): ${data.attachments||''}\n`+
+`영업/내부 CC: ${data.salesCC||''}\n`+
+`— 자동 생성 시각: ${new Date().toLocaleString()}\n`
+    );
+  }
+
+  function updatePreview(){
+    const body = buildEmailBody(formData());
+    $('#previewBody').value = body;
+  }
+
+  function sendEmail(){
+    const data = formData();
+    const recipient = $('#cfgRecipient').value.trim() || 'Techsupport.KR@bio-techne.com';
+    const ccCfg = $('#cfgCC').value.trim();
+    const subject = `[Complaint] ${data.company} — ${data.instrument} (${data.serial})`;
+    const body = buildEmailBody(data);
+    const ccPart = ccCfg ? `&cc=${encodeRFC3986(ccCfg)}` : '';
+    const mailto = `mailto:${encodeRFC3986(recipient)}?subject=${encodeRFC3986(subject)}${ccPart}&body=${encodeRFC3986(body)}`;
+    window.location.href = mailto;
+  }
+
+  async function testPost(){
+    const url = $('#endpoint').value.trim();
+    const data = formData();
+    if(!url){ $('#postResult').textContent = '엔드포인트 URL을 입력하세요.'; return; }
+    try{
+      const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
+      const txt = await res.text();
+      $('#postResult').textContent = `Response status: ${res.status}\n${txt}`;
+    }catch(err){ $('#postResult').textContent = '요청 실패: ' + err.message; }
+  }
+
+  function saveDraft(){ localStorage.setItem('cmpDraft', JSON.stringify(formData())); }
+  function loadDraft(){ try{ const d = JSON.parse(localStorage.getItem('cmpDraft')||'{}'); for(const [k,v] of Object.entries(d)){ const el = document.getElementById(k); if(el) el.value = v; } }catch(_){} }
+  function clearForm(){ $('#cmpForm').reset(); updatePreview(); }
+
+  // Download JSON / CSV of current form
+  function download(filename, content){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content], {type:'text/plain'}));
+    a.download = filename; a.click();
+  }
+
+  // i18n swap
+  function setLang(next){
+    lang = next; const t = I18N[lang];
+    $('#hero-title').textContent = t.heroTitle;
+    $('#hero-sub').textContent = t.heroSub;
+    $('#tab-guide').textContent = t.tabs.guide;
+    $('#tab-complaint').textContent = t.tabs.complaint;
+    $('#cmp-title').textContent = t.cmpTitle;
+    $('#preview-title').textContent = t.previewTitle;
+    $('#lbl-recipient').textContent = t.labels.recipient;
+    $('#lbl-cc').textContent = t.labels.cc;
+    $('#lbl-company').textContent = t.labels.company;
+    $('#lbl-contact').textContent = t.labels.contact;
+    $('#lbl-email').textContent = t.labels.email;
+    $('#lbl-phone').textContent = t.labels.phone;
+    $('#lbl-instrument').textContent = t.labels.instrument;
+    $('#lbl-serial').textContent = t.labels.serial;
+    $('#lbl-location').textContent = t.labels.location;
+    $('#lbl-urgency').textContent = t.labels.urgency;
+    $('#lbl-symptom').textContent = t.labels.symptom;
+    $('#lbl-details').textContent = t.labels.details;
+    $('#lbl-attachments').textContent = t.labels.attachments;
+    $('#lbl-salescc').textContent = t.labels.salescc;
+    $('#btnPreview').textContent = t.btns.preview;
+    $('#btnSendEmail').textContent = t.btns.send;
+    $('#btnSaveDraft').textContent = t.btns.save;
+    $('#btnClear').textContent = t.btns.clear;
+  }
+
+  // --- Init ------------------------------------------------------------------
+  function init(){
+    setTab('guide');
+    renderGuides('all','');
+    setLang('KR');
+    $('#year').textContent = new Date().getFullYear();
+
+    // Tab handlers
+    $('#tab-guide').addEventListener('click', () => setTab('guide'));
+    $('#tab-complaint').addEventListener('click', () => setTab('complaint'));
+
+    // Filter buttons
+    $$('#panel-guide [data-filter]').forEach(b => b.addEventListener('click', () => {
+      const f = b.getAttribute('data-filter');
+      renderGuides(f, $('#searchGuide').value);
+    }));
+    $('#searchGuide').addEventListener('input', (e)=> renderGuides('all', e.target.value));
+
+    // Complaint
+    $('#btnPreview').addEventListener('click', updatePreview);
+    $('#btnSendEmail').addEventListener('click', sendEmail);
+    $('#btnSaveDraft').addEventListener('click', saveDraft);
+    $('#btnClear').addEventListener('click', clearForm);
+    $('#cmpForm').addEventListener('input', updatePreview);
+    loadDraft(); updatePreview();
+
+    // Downloads
+    $('#downloadJSON').addEventListener('click', (e)=>{ e.preventDefault(); download('complaint.json', JSON.stringify(formData(), null, 2)); });
+    $('#downloadCSV').addEventListener('click', (e)=>{ e.preventDefault(); download('complaint.csv', objToCSV(formData())); });
+    $('#resetDraft').addEventListener('click', ()=>{ localStorage.removeItem('cmpDraft'); clearForm(); });
+
+    // Endpoint test
+    $('#btnTestPost').addEventListener('click', testPost);
+
+    // Lang buttons
+    $('#langKR').addEventListener('click', ()=> setLang('KR'));
+    $('#langEN').addEventListener('click', ()=> setLang('EN'));
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
